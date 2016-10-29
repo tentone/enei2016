@@ -6,10 +6,23 @@
 		<title>ENEI16</title>
 	</head>
 	<body onresize="resize();">
+		<script type="text/javascript" src="../lib/vr/webvr-polyfill.js"></script>
+		<script>
+			WebVRConfig =
+			{
+				FORCE_ENABLE_VR: true,
+				MOUSE_KEYBOARD_CONTROLS_DISABLED: false,
+				DEFER_INITIALIZATION: false,
+				BUFFER_SCALE: 1.0,
+				DIRTY_SUBMIT_FRAME_BINDINGS: false
+			};
+		</script>
 		<script type="text/javascript" src="../lib/three.min.js"></script>
+
 		<script type="text/javascript" src="../lib/vr/VRControls.js"></script>
 		<script type="text/javascript" src="../lib/vr/VREffect.js"></script>
 		<script type="text/javascript" src="../lib/vr/WebVR.js"></script>
+
 		<script type="text/javascript" src="main.js"></script>
 	</body>
 </html>
