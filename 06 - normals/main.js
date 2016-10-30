@@ -60,7 +60,7 @@ loader.load("../files/eyebot.obj", function(object)
 		}
 
 		//Eyebot (with normal map)
-		var material = new THREE.MeshPhongMaterial({color: 0x0000FF});
+		var material = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
 		material.specular.set(0x333333);
 		material.shininess = 30;
 		material.map = texture;

@@ -24,7 +24,14 @@ var scene = new THREE.Scene();
 //Camera
 var camera = new THREE.PerspectiveCamera(100, canvas.width/canvas.height, 0.1, 1000);
 camera.position.set(0, 0, 3);
-scene.add(camera);
+
+//Container
+var container = new THREE.Object3D();
+container.add(camera);
+scene.add(container);
+
+//Cube camera
+var cube_camera = new THREE.CubeCamera(0.1, 1000, 256);
 
 var eyebot = null;
 
@@ -50,6 +57,19 @@ loader.load("../files/eyebot.obj", function(object)
 			normal.needsUpdate = true;
 		}
 
+		//Material
+		var material = new THREE.MeshPhongMaterial();
+		material.map = texture;
+		material.normalMap = normal;
+		material.envMap = cube_camera.renderTarget.texture;
+		material.combine = THREE.MixOperation;
+		material.reflectivity = 0.7;
+
+		//Eyebot
+		eyebot = new THREE.Mesh(object.geometry, material);
+		eyebot.scale.set(0.02, 0.02, 0.02);
+		scene.add(eyebot);
+
 		//Cube map
 		var path = "../files/cube/";
 		var format = ".jpg";
@@ -62,30 +82,36 @@ loader.load("../files/eyebot.obj", function(object)
 
 		var cube = new THREE.CubeTextureLoader().load(urls);
 		cube.format = THREE.RGBFormat;
-		cube.mapping = THREE.CubeReflectionMapping;
+		
 		scene.background = cube;
-
-		//Material
-		var material = new THREE.MeshPhongMaterial();
-		material.map = texture;
-		material.normalMap = normal;
-		material.envMap = cube;
-		material.combine = THREE.MixOperation;
-		material.reflectivity = 1.0;
-
-		//Eyebot
-		eyebot = new THREE.Mesh(object.geometry, material);
-		eyebot.scale.set(0.02, 0.02, 0.02);
-		scene.add(eyebot);
 	});
 });
 
 //Light
 var light = new THREE.PointLight();
-light.color = new THREE.Color(0xCCCCCC);
+light.color = new THREE.Color(0xBBBBBB);
 light.position.set(0, 2, 4);
 light.castShadow = true;
 scene.add(light);
+
+//Boxes
+var boxes = [];
+var geometry = new THREE.BoxGeometry(1, 1, 1);
+boxes[0] = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
+boxes[0].position.x = 5;
+scene.add(boxes[0]);
+
+boxes[1] = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFF0000}));
+boxes[1].position.x = -5;
+scene.add(boxes[1]);
+
+boxes[2] = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0x00FF00}));
+boxes[2].position.z = -5;
+scene.add(boxes[2]);
+
+boxes[3] = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0x0000FF}));
+boxes[3].position.z = 5;
+scene.add(boxes[3]);
 
 //Mouse and keyboard
 var mouse = new Mouse();
@@ -100,22 +126,20 @@ function update()
 	//Schedule update call for next frame
 	requestAnimationFrame(update);
 
-	mouse.update();
 	keyboard.update();
+	mouse.update();
 
 	if(eyebot !== null)
 	{
-		//Rotate scene
+		//Rotate camera
 		if(mouse.buttonPressed(Mouse.LEFT))
 		{
 			var delta = mouse.delta.x * 0.004;
-			eyebot.rotation.y -= delta;
-			scene.rotation.y += delta;
+			container.rotation.y += delta;
 		}
 		else
 		{
-			eyebot.rotation.y -= 0.003;
-			scene.rotation.y += 0.003;
+			container.rotation.y += 0.003;
 		}
 
 		//Change eyebot material reflectivity
@@ -129,11 +153,24 @@ function update()
 			eyebot.material.reflectivity -= 0.01;
 			eyebot.material.needsUpdate = true;
 		}
+
+		//Update the cubemap
+		eyebot.visible = false;
+		cube_camera.position.copy(eyebot.position);
+		cube_camera.updateCubeMap(renderer, scene);
+		eyebot.visible = true;
 	}
-	
+
+	//Rotate the cubes
+	for(var i = 0; i < boxes.length; i++)
+	{
+		boxes[i].rotation.x += 0.01;
+		boxes[i].rotation.z += 0.02;
+	}
+
 	camera.position.z += mouse.wheel * 0.005;
 
-	//Render scene to screen
+	//Render the scene
 	renderer.render(scene, camera);
 }
 

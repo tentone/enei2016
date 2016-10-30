@@ -15,7 +15,7 @@ document.body.appendChild(canvas);
 var renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
 renderer.setSize(canvas.width, canvas.height);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setClearColor(0xFFFFFF);
+renderer.setClearColor(0x000000);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
