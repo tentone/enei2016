@@ -1,3 +1,3 @@
-# three.js ENEI 2016
+# WebGL with three.js ENEI 2016
 
-Files for the ENEI 2016 three.js workshop
+ - Files for the ENEI 2016 three.js workshop
